@@ -1,0 +1,46 @@
+cd C:/add/the/path/of/the/proyect
+
+add_files -norecurse {AD1RefComp.vhd DA2RefComp.vhd}
+
+add_files -fileset constrs_1 constrs.xdc
+set_property target_constrs_file constrs.xdc [current_fileset -constrset]
+
+startgroup
+create_bd_cell -type module -reference DA2RefComp DA2RefComp_0
+create_bd_cell -type module -reference AD1RefComp AD1RefComp_0
+endgroup
+
+ 
+connect_bd_net [get_bd_pins nameOfGeneratedIP/AI_OurInput1] [get_bd_pins AD1RefComp_0/DATA1]
+connect_bd_net [get_bd_pins nameOfGeneratedIP/AI_OurInput2] [get_bd_pins AD1RefComp_0/DATA2]
+connect_bd_net [get_bd_pins nameOfGeneratedIP/AI_OurOutput1] [get_bd_pins DA2RefComp_0/DATA1]
+connect_bd_net [get_bd_pins nameOfGeneratedIP/AI_OurOutput2]  [get_bd_pins DA2RefComp_0/DATA2]
+connect_bd_net [get_bd_pins AD1RefComp_0/DONE] [get_bd_pins AD1RefComp_0/START]
+connect_bd_net [get_bd_pins DA2RefComp_0/DONE] [get_bd_pins DA2RefComp_0/START] 
+connect_bd_net [get_bd_pins AD1RefComp_0/CLK] [get_bd_pins core_clkwiz/clk_out1]
+connect_bd_net [get_bd_pins AD1RefComp_0/NRST] [get_bd_pins sys_core_rstgen/peripheral_aresetn]
+connect_bd_net [get_bd_pins DA2RefComp_0/CLK] [get_bd_pins core_clkwiz/clk_out1]
+connect_bd_net [get_bd_pins DA2RefComp_0/NRST] [get_bd_pins sys_core_rstgen/peripheral_aresetn]
+
+create_bd_port -dir I -type data IN_DATA1
+create_bd_port -dir I -type data IN_DATA2
+create_bd_port -dir O -type data OUT_DATA1
+create_bd_port -dir O -type data OUT_DATA2
+create_bd_port -dir O -type clk AD1_CLK
+create_bd_port -dir O -type clk DA2_CLK
+create_bd_port -dir O -type ce AD1_CS
+create_bd_port -dir O -type data DA2_NSYNC
+
+connect_bd_net [get_bd_ports IN_DATA1] [get_bd_pins AD1RefComp_0/D1]
+connect_bd_net [get_bd_ports IN_DATA2] [get_bd_pins AD1RefComp_0/D2]
+connect_bd_net [get_bd_ports OUT_DATA1] [get_bd_pins DA2RefComp_0/D1]
+connect_bd_net [get_bd_ports OUT_DATA2] [get_bd_pins DA2RefComp_0/D2]
+connect_bd_net [get_bd_ports AD1_CLK] [get_bd_pins AD1RefComp_0/CLK_OUT]
+connect_bd_net [get_bd_ports DA2_CLK] [get_bd_pins DA2RefComp_0/CLK_OUT]
+connect_bd_net [get_bd_ports AD1_CS] [get_bd_pins AD1RefComp_0/CS]
+connect_bd_net [get_bd_ports DA2_NSYNC] [get_bd_pins DA2RefComp_0/nSYNC]
+
+regenerate_bd_layout
+
+validate_bd_design
+save_bd_design
